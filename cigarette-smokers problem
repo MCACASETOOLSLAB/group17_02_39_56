@@ -1,0 +1,130 @@
+There are four processes in the system. Three represent the smokers, and one represents the supplier.
+
+/* The Cigarette-smokers problem uses semaphores to solve. */
+typedef int semaphore;
+semaphore items=1; /*used for mutual exclusive access to the table on which the two ingredients are placed */
+semaphore more=0; 
+semaphore temp=0; /* used to queue the waiting smokers */
+int count =0; /*indicates the number is of waiting smokers */
+boolean flags[0..2]=initially all false;
+/*a flag true indicates if the corresponding item is on the table */
+/* the three items needed for smoking are named as 0,1,2 */
+/* process i has item i but needs the other two items, i.e (i-1) mod2 and (i+1)mod 2*/
+for 0<=i<=2;
+Smoker process i;
+{
+repeat
+wait(items); /*enter critical section */
+if (flag[i-1 % 2] and flag[+1 % 2])
+{
+flag[i-1 % 2]=false; 
+flag[i+1 % 2]=false;
+SMOKE;
+While(count >0)do
+{
+count --;
+signal(temp);
+}
+signal(more);
+}else{ /*both items needed for the smoking are not available */
+count++;
+signal(items);
+wait(temp); /*wait for the next round */
+}
+until false;
+}
+Supplier process:
+{
+repeat
+put any two items on the table and set the 
+corresponding flags to true;
+signal(items);
+wait(more);
+until false;
+}
+
+
+A full C program dealing with smokers problem is as follows:
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <conio.h>
+enum Ingredients /* Enum representing the ingredients */
+{
+None,
+Paper,
+Tobacco,
+Matches
+};
+/* Structure representing a Smoker & Agent process */
+typedef struct smoker
+{ 
+char SmokerID[25];
+int Item;
+}SMOKER;
+typedef struct agent
+{
+char AgentID[25];
+int Item1;
+int Item2;
+}AGENT;
+char* GetIngredientName(int Item)
+{
+if(Item == Paper)
+return "Paper";
+else if(Item == Tobacco)
+return "Tobacco";
+else if(Item == Matches)
+return "Matches";
+}
+void GetAgentIngredients(AGENT* agent)
+{
+/* Simulate random generation of ingredients*/
+agent->Item1=random(3)+1;
+while(1)
+{
+agent->Item2=random(3)+1;
+if(agent->Item1 != agent->Item2)
+break;
+}
+printf("\nAgent Provides Ingredients- %s,%s\n\n:,
+GetIngredientName(agent->Item1),GetIngredientName(agent->Item2));
+}
+void GiveIngredientToSmoker(AGENT*agent,SMOKER* smoker)
+{
+int index=0;
+while(smoker[index].Item !=NULL)
+{
+if((smoker[index].Item !=agent->Item1)&&(smoker[index].Item != 
+agent->Item2));
+{
+printf("\nSmoker - \%s\"-is smoking his cigarette\n\n", smoker[index].SmokerID);
+agent->Item1=None;
+agent->Item2=None;
+break;
+}
+index++;
+}
+}
+void main()
+{
+/*Create the processes required -1 Agent, 3 Smokers */
+AGENT agent;
+SMOKER smoker[4] = {{SmokerWithPaper",Paper},
+{"SmokerWithTobacco",Tobacco},
+{"SmokerWithMatches",Matches},{"\0",None}};
+int userChoice=0;
+strcpy(agent.AgentID,"Agent");
+agent.Item1=None;
+agent>item2=None;
+while(1)
+{
+GetAgentIngredients(&agent);
+GiveIngredientToSmoker(&agent,smoker);
+printf("Press ESC to exit or any key to continue\n\n");
+UserChoice=getch();
+If(UserChoice ==27)
+break;
+}
+}
