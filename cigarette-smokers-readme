@@ -1,0 +1,182 @@
+                                        CIGARETTE-SMOKERS PROBLEM
+                        
+Assume a cigarette requires three ingredients to smoke:
+
+    Tobacco
+    Smoking Paper
+    A Match
+
+Assume there are also three chain smokers around a table, each of whom has an infinite supply of one of the three ingredients — one smoker has an infinite supply of tobacco, another has an infinite supply of paper, and the third has an infinite supply of matches.
+
+Assume there is also a non-smoking arbiter. The arbiter enables the smokers to make their cigarettes by arbitrarily (non deterministically) selecting two of the smokers, taking one item out of each of their supplies, and placing the items on the table. The arbiter then notifies the third smoker that they have done this. The third smoker removes the two items from the table and uses them (along with their own supply) to make a cigarette, which they smoke for a while. Meanwhile, the arbiter, seeing the table empty, again chooses two smokers at random and places their items on the table. This process continues forever.
+
+The smokers do not hoard items from the table; a smoker only begins to roll a new cigarette once they have finished smoking the last one. For instance if the arbiter places tobacco and paper on the table while the match-supply smoker is smoking, the tobacco and paper will remain untouched on the table until the match-supply smoker is finished with their cigarette and then collects the items.
+
+
+Patil's Version
+
+There are two restrictions on the solution:
+
+    The agent code cannot be modified
+    Conditional statements and arrays of semaphores are not allowed
+
+With these restrictions, this problem is unsolvable. The Patil's version is also called the impossible version. However, while the first restriction makes sense because the operating system's code should not be modified every time we need to solve a problem, the second restriction is not reasonable, according to David Parnas. He called such restriction "artificial" and said that artificial restrictions make many problems unsolvable.
+
+
+The Trivial Version
+
+In this version, the agent signals the smoker who has the complementary ingredients after putting the two ingredients on the table. This version can be solved quite easily.
+
+Initialization
+agentSemaphore = init(1) // the semaphore for the agent, initialized to 1
+
+for s in smokerSemaphores: // smokerSemaphores is an array of three semaphores
+                           // for three smokers
+
+    s = init(1) // all the three semaphores are initialized to 1
+
+The agent code
+while (1):
+    P(agentSemaphore)
+
+    i, j = chooseIngredients() // choose two ingredients at random
+
+    putOnTable(i, j)
+
+    u = findComplimentarySmoker(i, j) // the smoker who has the
+                                      // complimentary ingredient
+
+    V(smokerSemaphores[u])
+
+The code for the first smoker is presented below. The codes for other smokers are similar.
+while (1):
+    P(smokerSemaphores[0])
+    makeCigarette()
+    V(agentSemaphore)
+    smoke()
+
+The smoker takes the two ingredients on the table, makes a cigarette and wakes up the agent by calling V(agentSemaphore). While this smoker is smoking, the agent continues to put two ingredients on the table. If these ingredients are different from the last two, the agent can wake up another smoker. Otherwise, the smoker who is smoking can make another cigarette after he has finished smoking.
+
+In summary, this version is easy to solve because the agent knows who to signal. However, this may not be the case in practice because the operating system may not know the required resources of the processes before hand. We will consider a more interesting version.
+
+The Interesting Version
+
+This version only keeps the first restriction of the Patil's version, which is the agent code cannot be modified.
+
+The agent uses four semaphores as follows:
+agentSemaphore = init(1) // the semaphore for the agent
+
+tobaccoSemaphore = init(0) // the semaphore for tobacco on the table
+
+paperSemaphore = init(0) // the semaphore for paper on the table
+
+matchSemaphore = init(0) // the semaphore for match on the table
+
+The agent uses three threads, each of which is for putting two ingredients on the table. When V(agentSemaphore) is called, one of the threads will wake up and put two ingredients on the table. The code for the thread which puts tobacco and paper on the table is presented below. The codes for other threads are similar.
+while (1):
+    P(agentSemaphore)
+    V(tobaccoSemaphore)
+    V(paperSemaphore)
+
+A Non-Solution
+
+Consider the following codes for the three smokers.
+while (1): // this smoker has infinite supply of match
+    P(tobaccoSemaphore)
+    P(paperSemaphore)
+    makeCigarette()
+    V(agentSemaphore)
+    smoke()
+
+while (1): // this smoker has infinite supply of paper
+    P(tobaccoSemaphore)
+    P(matchSemaphore)
+    makeCigarette()
+    V(agentSemaphore)
+    smoke()
+
+while (1): // this smoker has infinite supply of tobacco
+    P(paperSemaphore)
+    P(matchSemaphore)
+    makeCigarette()
+    V(agentSemaphore)
+    smoke()
+
+This is a non-solution because deadlock can occur. Suppose one agent thread puts tobacco and paper on the table. The smoker with infinite supply of match is blocking on tobacco so he can pick tobacco up. At the same time, the smoker with infinite supply of tobacco is blocking on paper so he can pick paper up. Now the first smoker blocks on paper and the second smoker blocks on match. This is a deadlock. For comparison with the dining philosophers problem, this is similar to the case where all the philosophers pick up the left forks and block on the right forks.
+
+A Solution
+
+The solution below is similar to David Parnas' solution. Parnas' codes are more complex in order to avoid conditional statements.
+
+Initialization
+isTobacco = false // tobacco is not on the table
+
+isPaper = false // paper is not on the table
+
+isMatch = false // match is not on the table
+
+tobaccoSmokerSemaphore = init(0) // the semaphore for the smoker with
+                                 // infinite supply of tobacco
+
+paperSmokerSemaphore = init(0) // the semaphore for the smoker with
+                               // infinite supply of paper
+
+matchSmokerSemaphore = init(0) // the semaphore for the smoker with
+                               // infinite supply of match
+
+mutex = init(1) // the mutex used in the codes below
+
+This solution uses three threads called pushers to signal the smokers with the complementary ingredient. The code for one pusher is presented below. The codes for the other two pushers are similar.
+// this semaphore is introduced in the non-solution agent thread
+P(tobaccoSemaphore)
+
+P(mutex)
+
+if isPaper:
+    isPaper = false
+    V(matchSmokerSemaphore)
+else if isMatch:
+    isMatch = false
+    V(paperSmokerSemaphore)
+else:
+    isTobacco = true
+    V(mutex)
+
+The code for one smoker is presented below. The codes for other smokers are similar.
+P(matchSmokerSemaphore)
+makeCigarette()
+V(agentSemaphore)
+smoke()
+
+This pusher wakes up after one of the agent threads put tobacco on the table. If isPaper or isMatch is true, paper or match is on the table and has been "intercepted" (to be explained later) by one of the other two pushers. Therefore, this pusher can wake either the match smoker or the paper smoker up. If neither isPaper nor isMatch is true, paper or match is on the table (because there are two ingredients on the table and the first one is tobacco) but not yet "intercepted" by one of the other two pushers. In this case, this pusher set isTobacco to true so that any pusher who runs later will know that tobacco has been "intercepted". The mutex is used to ensure only one pusher enters the critical section at one time.
+
+The pushers can be seen as a processing unit which responds to the agent (or the available ingredients) by signaling the appropriate smoker. This is what we mean by "intercept" in the above paragraph. Moreover, isTobacco and tobaccoSemaphore are slightly different. isTobacco indicates whether tobacco has been "intercepted" while tobaccoSemaphore indicates whether tobacco is on the table. An ingredient can be on the table and not yet "intercepted" by the pushers.
+
+By using the pushers, we have separated the signal code from the agent. Compared to the agent in the trivial solution, which does both putting ingredients and signaling the smokers, this is more modular programming because the agent does one task and the pushers do one task. Later if the problem statement changes slightly, we only have to modify the pushers code. Thus, the restriction of not modifying the agent code is satisfied.
+
+The Generalized Version
+
+This version is suggested by Parnas where the agent does not wait for the smokers. That means the agent repeatedly puts the ingredients and there can be multiple instances of one ingredient on the table. How do we modify the solution to solve this generalized problem?
+
+We replace boolean variables by integers to keep track of the number of instances of each ingredient.
+nTobacco = 0
+nPaper = 0
+nMatch = 0
+
+The pusher code is modified accordingly.
+P(tobaccoSemaphore)
+P(mutex)
+if nPaper > 0:
+    nPaper--
+    V(matchSmokerSemaphore)
+else if isMatch > 0:
+    nMatch--
+    V(paperSmokerSemaphore)
+else:
+    nTobacco++
+V(mutex)
+
+Interestingly, in this case, the values of tobaccoSemaphore, paperSemaphore and matchSemaphore can go beyond 1, and that is absolutely fine. nTobacco is the number of "intercepted" but not yet combined with other ingredients while tobaccoSemaphore indicates the total number of instances of tobacco on the table. Each time a pusher enters the critical section, it looks for combinations of two ingredients. If there is such a combination, it signals the appropriate smoker. Otherwise, it just increases the number of "intercepted" instances of the corresponding ingredient.
+
+
+//////////////****************************************************************/////////////////////////////////////
