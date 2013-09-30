@@ -1,0 +1,14 @@
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\bin\Debug\SmokersProblem1.exe
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\bin\Debug\SmokersProblem1.pdb
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.Form1.resources
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.Form2.resources
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.Properties.Resources.resources
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.exe
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.pdb
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.Form3.resources
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.Form4.resources
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.Form5.resources
+C:\Users\Ali\Desktop\SmokersProblem1\SmokersProblem1\obj\x86\Debug\SmokersProblem1.Form6.resources
