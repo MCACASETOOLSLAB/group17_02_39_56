@@ -1,0 +1,10 @@
+group17_02_39_56
+================
+"The folder SmokersProblem1 is GUI based made by c#." 
+
+"Please visit SmokersProblem1/SmokersProblem1.sln in visual studio to have a look on what I made."
+
+After opening that in visual studio you can run that by pressing F5.
+(When agent is asked to select two smokers, and if you select either only 1 smoker or all three smokers then a message will be displayed saying that "Agent has to select exactly two smokers.")
+You can also see the flowchart of Cigarette Smokers Problem on clicking "FLOWCHART".
+Whenever you want to stop you can click "EXIT".
